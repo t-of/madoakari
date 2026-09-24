@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#141a33">
+  <meta name="description" content="夜の建物の窓をタップして明かりをつける。押した窓と上下左右のとなりが一緒に切り替わるので、どこを押すかを考えて、なるべく少ない数で全部の窓を灯す。">
+  <title>まどあかり — 夜の窓をぜんぶ灯す</title>
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="まどあかり">
+  <meta property="og:title" content="まどあかり — 夜の窓をぜんぶ灯す">
+  <meta property="og:description" content="夜の建物の窓をタップして明かりをつける。押した窓と上下左右のとなりが一緒に切り替わるので、どこを押すかを考えて、なるべく少ない数で全部の窓を灯す。">
+  <meta property="og:url" content="https://t-of.github.io/madoakari/">
+  <meta property="og:image" content="https://t-of.github.io/madoakari/icons/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- apple-mobile-web-app-status-bar-style は付けない（black-translucent だと iOS 26 で上部が隠れる） -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="まどあかり">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="./webapp-kit/webapp-kit.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- タイトル -->
+  <main class="screen title" id="title">
+    <header class="title__head">
+      <div class="building building--sample" id="sample" aria-hidden="true"></div>
+      <h1 class="title__name">まどあかり</h1>
+      <p class="title__catch">夜の窓をぜんぶ灯す</p>
+    </header>
+
+    <ol class="howto">
+      <li>窓をタップすると、<b>その窓と上下左右のとなり</b>の明かりが切り替わる</li>
+      <li><b>全部の窓が灯ったらクリア</b></li>
+      <li>押した数が少ないほどよい。同じ窓をもう 1 回押すと元に戻る</li>
+    </ol>
+
+    <section class="pick">
+      <h2 class="pick__label">大きさ</h2>
+      <div class="sizes" id="sizes"></div>
+      <div class="custom" id="custom" hidden>
+        <div class="stepper" data-dim="rows">
+          <span class="stepper__name">縦</span>
+          <button class="stepper__btn" data-step="-1" aria-label="縦を減らす">−</button>
+          <output class="stepper__val"></output>
+          <button class="stepper__btn" data-step="1" aria-label="縦を増やす">＋</button>
+        </div>
+        <div class="stepper" data-dim="cols">
+          <span class="stepper__name">横</span>
+          <button class="stepper__btn" data-step="-1" aria-label="横を減らす">−</button>
+          <output class="stepper__val"></output>
+          <button class="stepper__btn" data-step="1" aria-label="横を増やす">＋</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="pick">
+      <h2 class="pick__label">始まりの形</h2>
+      <div class="patterns" id="patterns"></div>
+      <p class="pick__note" id="unsolvable" hidden></p>
+    </section>
+
+    <p class="record" id="record" hidden></p>
+    <button class="btn btn--main" id="play-btn">あそぶ</button>
+
+    <footer class="foot">
+      <div class="foot__actions">
+        <button class="pill" id="sound-btn" aria-pressed="true">音 オン</button>
+        <button class="pill" data-wak="install" hidden>アプリにする</button>
+        <button class="pill" data-wak="share">共有</button>
+      </div>
+      <p class="credit"><a href="/">T.OF...</a> のアプリ</p>
+    </footer>
+  </main>
+
+  <!-- 遊ぶ -->
+  <main class="screen play" id="play" hidden>
+    <header class="hud">
+      <button class="pill hud__back" id="back-btn">もどる</button>
+      <div class="hud__moves"><span class="hud__label">押した数</span><span class="hud__num" id="moves">0</span></div>
+      <div class="hud__min">最少 <span id="min">0</span></div>
+    </header>
+
+    <section class="stage" id="stage">
+      <div class="building" id="building">
+        <div class="building__roof" aria-hidden="true"><span class="tank"></span></div>
+        <div class="windows" id="board"></div>
+      </div>
+    </section>
+
+    <footer class="tools">
+      <button class="btn" id="reset-btn">はじめから</button>
+      <button class="btn" id="another-btn" hidden>べつの盤</button>
+    </footer>
+
+    <!-- クリア（盤の上に下寄せで重ねる） -->
+    <section class="clear" id="clear" hidden>
+      <div class="clear__card" role="dialog" aria-labelledby="clear-title">
+        <h2 class="clear__title" id="clear-title">ぜんぶ灯った</h2>
+        <p class="clear__moves"><span id="clear-moves">0</span> 回</p>
+        <p class="clear__min">最少 <span id="clear-min">0</span> 回</p>
+        <p class="clear__badges" id="badges"></p>
+        <button class="btn btn--main" id="again-btn">もう一度</button>
+        <div class="clear__row">
+          <button class="btn" id="share-btn">共有</button>
+          <button class="btn" id="home-btn">タイトルへ</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./webapp-kit/webapp-kit.js"></script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

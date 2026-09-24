@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "まどあかり — 夜の窓をぜんぶ灯す",
+  "short_name": "まどあかり",
+  "description": "夜の建物の窓をタップして明かりをつける。押した窓と上下左右のとなりが一緒に切り替わるので、どこを押すかを考えて、なるべく少ない数で全部の窓を灯す。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#141a33",
+  "theme_color": "#141a33",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
